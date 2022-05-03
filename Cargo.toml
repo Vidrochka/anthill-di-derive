@@ -1,0 +1,16 @@
+[package]
+name = "anthill-di-derive"
+version = "0.1.0"
+authors = ["Vidrochka <Evgenuy1605@yandex.ru>"]
+edition = "2021"
+description = "Derive extension for anthill-di"
+license = "MIT"
+keywords = ["anthill-di-derive", "anthill", "di", "anthill-di", "dependency-injection"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0.37"
+quote = "1.0.18"
+syn = "1.0.92"
