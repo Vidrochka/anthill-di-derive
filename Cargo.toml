@@ -1,6 +1,6 @@
 [package]
 name = "anthill-di-derive"
-version = "0.1.0"
+version = "1.2.3"
 authors = ["Vidrochka <Evgenuy1605@yandex.ru>"]
 edition = "2021"
 description = "Derive extension for anthill-di"

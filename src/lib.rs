@@ -78,8 +78,10 @@ fn new_impl(
 
     my_quote! {
         impl #impl_generics anthill_di::Constructor for #name #ty_generics #where_clause {
-            fn ctor<'async_trait>(ctx: anthill_di::DependencyContext) -> std::pin::Pin<Box<dyn std::future::Future<Output = anthill_di::types::BuildDependencyResult<Self>> + core::marker::Send + 'async_trait>> where Self: 'async_trait {
+            fn ctor<'async_trait>(ctx: anthill_di::DependencyContext) -> std::pin::Pin<Box<dyn std::future::Future<Output = anthill_di::types::BuildDependencyResult<Self>> + core::marker::Send + core::marker::Sync + 'async_trait>> where Self: 'async_trait {
                 Box::pin(async move {
+                    let ctx = ctx;
+                    
                     #assigns;
                     #ioc_context_init;
 

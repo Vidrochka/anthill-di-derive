@@ -32,6 +32,9 @@ struct TestInjection1 {
 }
 ```
 
-#### Refs
+Crate version is equal minimal required version of ```anthill-di```
+
+Crate required dependency:
 
 * [anthill-di](https://github.com/Vidrochka/anthill-di)
+* [async-trait-with-sync](https://crates.io/crates/async-trait-with-sync)
