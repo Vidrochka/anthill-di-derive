@@ -61,21 +61,21 @@ fn new_impl(
 
     let (impl_generics, ty_generics, where_clause) = ast.generics.split_for_impl();
 
-    // let t = my_quote! {
-    //     impl #impl_generics anthill_di::Constructor for #name #ty_generics #where_clause {
-    //         fn ctor<'async_trait>(ctx: anthill_di::DependencyContext) -> std::pin::Pin<Box<dyn std::future::Future<Output = anthill_di::types::BuildDependencyResult<Self>> + core::marker::Send + 'async_trait>> where Self: 'async_trait {
-    //             Box::pin(async move {
-    //                 #assigns;
+    #[cfg(not(feature = "async-mode"))]
+    my_quote! {
+        impl #impl_generics anthill_di::Constructor for #name #ty_generics #where_clause {
+            fn ctor(ctx: anthill_di::DependencyContext) -> anthill_di::types::BuildDependencyResult<Self> {
+                let ctx = ctx;
+                    
+                #assigns;
+                #ioc_context_init;
 
-    //                 Ok(#name {#inits} )
-    //             })
-    //         }
-    //     }
-    // };
+                Ok(#name {#inits} )
+            }
+        }
+    }
 
-    //panic!("{fields:?}");
-    //panic!("{t}");
-
+    #[cfg(feature = "async-mode")]
     my_quote! {
         impl #impl_generics anthill_di::Constructor for #name #ty_generics #where_clause {
             fn ctor<'async_trait>(ctx: anthill_di::DependencyContext) -> std::pin::Pin<Box<dyn std::future::Future<Output = anthill_di::types::BuildDependencyResult<Self>> + core::marker::Send + core::marker::Sync + 'async_trait>> where Self: 'async_trait {
@@ -144,6 +144,9 @@ impl<'a> FieldExt<'a> {
             my_quote!(::std::marker::PhantomData)
         } else {
             match self.attr {
+                #[cfg(not(feature = "async-mode"))]
+                None => my_quote!(ctx.resolve()?),
+                #[cfg(feature = "async-mode")]
                 None => my_quote!(ctx.resolve().await?),
                 Some(ref attr) => attr.as_tokens(),
             }
@@ -171,8 +174,17 @@ impl FieldAttr {
     pub fn as_tokens(&self) -> proc_macro2::TokenStream {
         match *self {
             FieldAttr::IocContext => my_quote!(ctx),
+            #[cfg(not(feature = "async-mode"))]
+            FieldAttr::Resolve => my_quote!(ctx.resolve()?),
+            #[cfg(feature = "async-mode")]
             FieldAttr::Resolve => my_quote!(ctx.resolve().await?),
+            #[cfg(not(feature = "async-mode"))]
+            FieldAttr::ResolveCollection => my_quote!(ctx.resolve_collection()?),
+            #[cfg(feature = "async-mode")]
             FieldAttr::ResolveCollection => my_quote!(ctx.resolve_collection().await?),
+            #[cfg(not(feature = "async-mode"))]
+            FieldAttr::ResolveByComponent(ref s) => my_quote!(ctx.resolve_by_type_id(std::any::TypeId::of::<#s>())?),
+            #[cfg(feature = "async-mode")]
             FieldAttr::ResolveByComponent(ref s) => my_quote!(ctx.resolve_by_type_id(std::any::TypeId::of::<#s>()).await?),
             FieldAttr::Value(ref s) => my_quote!(#s),
         }

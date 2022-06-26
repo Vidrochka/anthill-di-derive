@@ -1,6 +1,6 @@
 [package]
 name = "anthill-di-derive"
-version = "1.2.3"
+version = "1.2.4"
 authors = ["Vidrochka <Evgenuy1605@yandex.ru>"]
 edition = "2021"
 description = "Derive extension for anthill-di"
@@ -14,3 +14,7 @@ proc-macro = true
 proc-macro2 = "1.0.37"
 quote = "1.0.18"
 syn = "1.0.92"
+
+[features]
+default = ["async-mode"]
+async-mode = []
